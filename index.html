@@ -68,6 +68,15 @@
         tr.best-cost {
             background-color: #d4efdf !important;
         }
+        /* Added styling for centered units in brackets */
+        th span.unit {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+        th sup {
+            font-size: 0.7em;
+        }
     </style>
 </head>
 <body>
@@ -277,23 +286,23 @@
                 }
             }
 
-            // Display results with updated column headings
+            // Display results with neatly formatted column headings
             const columns = [
-                "Fck(N/mm²)",
-                "Fy(N/mm²)",
-                "Slab Type",
-                "Total Depth(mm)",
-                "Ultimate Moment of Resistance(KNm)",
-                "Main Bar Dia(mm)",
-                "Main Bar Spacing(mm c/c)",
-                "Dist Bar Dia(mm)",
-                "Dist Bar Spacing(mm c/c)",
-                "Shear Check",
-                "Total Steel Weight(kg)",
-                "No of Cement Bags(50kg/bag)",
-                "Sand (Ton)",
-                "Aggregate (Ton)",
-                "Total Price"
+                'Fck <span class="unit">(N/mm<sup>2</sup>)</span>',
+                'Fy <span class="unit">(N/mm<sup>2</sup>)</span>',
+                'Slab Type',
+                'Total Depth <span class="unit">(mm)</span>',
+                'Ultimate Moment of Resistance <span class="unit">(KNm)</span>',
+                'Main Bar Dia <span class="unit">(mm)</span>',
+                'Main Bar Spacing <span class="unit">(mm c/c)</span>',
+                'Dist Bar Dia <span class="unit">(mm)</span>',
+                'Dist Bar Spacing <span class="unit">(mm c/c)</span>',
+                'Shear Check',
+                'Total Steel Weight <span class="unit">(kg)</span>',
+                'No of Cement Bags <span class="unit">(50kg/bag)</span>',
+                'Sand <span class="unit">(Ton)</span>',
+                'Aggregate <span class="unit">(Ton)</span>',
+                'Total Price'
             ];
             let html = '<table><thead><tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr></thead><tbody>';
             if (results.length === 0) {
