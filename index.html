@@ -277,8 +277,24 @@
                 }
             }
 
-            // Display results
-            const columns = ["Fck", "Fy", "Slab Type", "Total Depth", "Ultimate Moment of Resistance", "Main Bar Dia", "Main Bar Spacing", "Dist Bar Dia", "Dist Bar Spacing", "Shear Check", "Total Steel Weight", "No of Cement Bags", "Sand in Tons", "Aggregate in Tons", "Total Price"];
+            // Display results with updated column headings
+            const columns = [
+                "Fck(N/mm²)",
+                "Fy(N/mm²)",
+                "Slab Type",
+                "Total Depth(mm)",
+                "Ultimate Moment of Resistance(KNm)",
+                "Main Bar Dia(mm)",
+                "Main Bar Spacing(mm c/c)",
+                "Dist Bar Dia(mm)",
+                "Dist Bar Spacing(mm c/c)",
+                "Shear Check",
+                "Total Steel Weight(kg)",
+                "No of Cement Bags(50kg/bag)",
+                "Sand (Ton)",
+                "Aggregate (Ton)",
+                "Total Price"
+            ];
             let html = '<table><thead><tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr></thead><tbody>';
             if (results.length === 0) {
                 html += '<tr><td colspan="15">No valid designs found. Adjust inputs.</td></tr>';
