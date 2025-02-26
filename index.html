@@ -68,6 +68,12 @@
         tr.best-cost {
             background-color: #d4efdf !important;
         }
+        .chart-container {
+            margin-top: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
@@ -123,9 +129,18 @@
                 <input type="number" id="steelFe550Rate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
         </div>
-        <div id="results"></div>
+        <div id="results">
+            <div id="table-container"></div>
+            <div class="chart-container">
+                <canvas id="costChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="depthChart"></canvas>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const fckValues = [20, 25, 30];
         const fyValues = [415, 500, 550];
@@ -146,6 +161,8 @@
             2.75: { 'M15': 0.71, 'M20': 0.82, 'M25': 0.90, 'M30': 0.94, 'M35': 0.96, 'M40+': 0.98 },
             3.00: { 'M15': 0.71, 'M20': 0.82, 'M25': 0.92, 'M30': 0.96, 'M35': 0.99, 'M40+': 1.01 }
         };
+
+        let costChart, depthChart;
 
         function calculateShearStrength(Asbd_100, grade) {
             let gradeKey = grade < 40 ? `M${grade}` : 'M40+';
@@ -175,7 +192,6 @@
         }
 
         function calculateSlabDesign() {
-            // Get input values
             const inputs = {
                 longerSpan: Number(document.getElementById('longerSpan').value) || 0,
                 shorterSpan: Number(document.getElementById('shorterSpan').value) || 0,
@@ -191,9 +207,9 @@
                 rateSteel550: Number(document.getElementById('steelFe550Rate').value) || 0
             };
 
-            // Check if all inputs are filled to proceed with calculations
             if (Object.values(inputs).some(val => val === 0)) {
-                document.getElementById('results').innerHTML = '<p>Please fill all fields to see results.</p>';
+                document.getElementById('table-container').innerHTML = '<p>Please fill all fields to see results.</p>';
+                destroyCharts();
                 return;
             }
 
@@ -277,7 +293,6 @@
                 }
             }
 
-            // Display results with updated column headings
             const columns = [
                 "Fck(N/mm²)",
                 "Fy(N/mm²)",
@@ -298,15 +313,111 @@
             let html = '<table><thead><tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr></thead><tbody>';
             if (results.length === 0) {
                 html += '<tr><td colspan="15">No valid designs found. Adjust inputs.</td></tr>';
+                destroyCharts();
             } else {
                 let minPrice = Math.min(...results.map(r => r[14]));
                 results.forEach(row => {
                     let isBestCost = row[14] === minPrice;
                     html += `<tr${isBestCost ? ' class="best-cost"' : ''}>` + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
                 });
+                html += '</tbody></table>';
+                updateCharts(results);
             }
-            html += '</tbody></table>';
-            document.getElementById('results').innerHTML = html;
+            document.getElementById('table-container').innerHTML = html;
+        }
+
+        function destroyCharts() {
+            if (costChart) costChart.destroy();
+            if (depthChart) depthChart.destroy();
+        }
+
+        function updateCharts(results) {
+            destroyCharts();
+
+            // Line Graph: Cost vs Combinations
+            const combinations = results.map(r => `${r[0]}-${r[1]}`);
+            const prices = results.map(r => r[14]);
+            const costCtx = document.getElementById('costChart').getContext('2d');
+            costChart = new Chart(costCtx, {
+                type: 'line',
+                data: {
+                    labels: combinations,
+                    datasets: [{
+                        label: 'Total Price (INR)',
+                        data: prices,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Combinations of Fck,Fy'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Total Price (INR)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Cost vs Combinations'
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart: Total Depth vs Ultimate Moment of Resistance
+            const depths = results.map(r => r[3]);
+            const moments = results.map(r => r[4]);
+            const depthCtx = document.getElementById('depthChart').getContext('2d');
+            depthChart = new Chart(depthCtx, {
+                type: 'bar',
+                data: {
+                    labels: depths,
+                    datasets: [{
+                        label: 'Ultimate Moment of Resistance (KNm)',
+                        data: moments,
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Total Depth (mm)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Ultimate Moment of Resistance (KNm)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total Depth vs Ultimate Moment of Resistance (KNm)'
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
