@@ -46,21 +46,17 @@
             box-sizing: border-box;
         }
         #results {
-            overflow-x: hidden; /* Remove horizontal scrolling */
+            overflow-x: auto;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: auto; /* Allow columns to adjust automatically */
         }
         th, td {
-            padding: 8px; /* Reduced padding from 12px to 8px */
+            padding: 12px;
             text-align: center;
             border: 1px solid #ddd;
-            white-space: normal; /* Allow text wrapping */
-            word-wrap: break-word; /* Break long words if needed */
-            font-size: 14px; /* Slightly smaller font size */
         }
         th {
             background-color: #3498db;
@@ -71,14 +67,6 @@
         }
         tr.best-cost {
             background-color: #d4efdf !important;
-        }
-        th span.unit {
-            display: inline-block;
-            vertical-align: middle;
-            font-size: 0.9em;
-        }
-        th sup {
-            font-size: 0.7em;
         }
     </style>
 </head>
@@ -289,24 +277,8 @@
                 }
             }
 
-            // Display results with neatly formatted column headings
-            const columns = [
-                'Fck <span class="unit">(N/mm<sup>2</sup>)</span>',
-                'Fy <span class="unit">(N/mm<sup>2</sup>)</span>',
-                'Slab Type',
-                'Total Depth <span class="unit">(mm)</span>',
-                'Ultimate Moment of Resistance <span class="unit">(KNm)</span>',
-                'Main Bar Dia <span class="unit">(mm)</span>',
-                'Main Bar Spacing <span class="unit">(mm c/c)</span>',
-                'Dist Bar Dia <span class="unit">(mm)</span>',
-                'Dist Bar Spacing <span class="unit">(mm c/c)</span>',
-                'Shear Check',
-                'Total Steel Weight <span class="unit">(kg)</span>',
-                'No of Cement Bags <span class="unit">(50kg/bag)</span>',
-                'Sand <span class="unit">(Ton)</span>',
-                'Aggregate <span class="unit">(Ton)</span>',
-                'Total Price'
-            ];
+            // Display results
+            const columns = ["Fck", "Fy", "Slab Type", "Total Depth", "Ultimate Moment of Resistance", "Main Bar Dia", "Main Bar Spacing", "Dist Bar Dia", "Dist Bar Spacing", "Shear Check", "Total Steel Weight", "No of Cement Bags", "Sand in Tons", "Aggregate in Tons", "Total Price"];
             let html = '<table><thead><tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr></thead><tbody>';
             if (results.length === 0) {
                 html += '<tr><td colspan="15">No valid designs found. Adjust inputs.</td></tr>';
