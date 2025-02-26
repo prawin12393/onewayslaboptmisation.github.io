@@ -45,21 +45,6 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
-        button {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
         #results {
             overflow-x: auto;
         }
@@ -91,54 +76,53 @@
         <div class="input-group">
             <div class="input-field">
                 <label for="longerSpan">Longer Span (m):</label>
-                <input type="number" id="longerSpan" step="0.01" required>
+                <input type="number" id="longerSpan" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="shorterSpan">Shorter Span (m):</label>
-                <input type="number" id="shorterSpan" step="0.01" required>
+                <input type="number" id="shorterSpan" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="liveLoad">Live Load (kN/m²):</label>
-                <input type="number" id="liveLoad" step="0.01" required>
+                <input type="number" id="liveLoad" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="floorFinish">Floor Finish (kN/m²):</label>
-                <input type="number" id="floorFinish" step="0.01" required>
+                <input type="number" id="floorFinish" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="mainBarDia">Main Bar Diameter (mm):</label>
-                <input type="number" id="mainBarDia" required>
+                <input type="number" id="mainBarDia" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="distBarDia">Distribution Bar Diameter (mm):</label>
-                <input type="number" id="distBarDia" required>
+                <input type="number" id="distBarDia" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="sandRate">Sand Rate (per ton):</label>
-                <input type="number" id="sandRate" step="0.01" required>
+                <input type="number" id="sandRate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="aggregateRate">Aggregate Rate (per ton):</label>
-                <input type="number" id="aggregateRate" step="0.01" required>
+                <input type="number" id="aggregateRate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="cementRate">Cement Rate (per 50kg bag):</label>
-                <input type="number" id="cementRate" step="0.01" required>
+                <input type="number" id="cementRate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="steelFe415Rate">Steel Fe415 Rate (per kg):</label>
-                <input type="number" id="steelFe415Rate" step="0.01" required>
+                <input type="number" id="steelFe415Rate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="steelFe500Rate">Steel Fe500 Rate (per kg):</label>
-                <input type="number" id="steelFe500Rate" step="0.01" required>
+                <input type="number" id="steelFe500Rate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
             <div class="input-field">
                 <label for="steelFe550Rate">Steel Fe550 Rate (per kg):</label>
-                <input type="number" id="steelFe550Rate" step="0.01" required>
+                <input type="number" id="steelFe550Rate" step="0.01" required oninput="calculateSlabDesign()" onkeydown="moveToNext(event)">
             </div>
         </div>
-        <button onclick="calculateSlabDesign()">Calculate</button>
         <div id="results"></div>
     </div>
 
@@ -179,35 +163,54 @@
             return tauTable[Asbd_100][gradeKey];
         }
 
+        function moveToNext(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const inputs = Array.from(document.querySelectorAll('.input-field input'));
+                const currentIndex = inputs.indexOf(event.target);
+                if (currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                }
+            }
+        }
+
         function calculateSlabDesign() {
             // Get input values
-            const longerSpan = Number(document.getElementById('longerSpan').value);
-            const shorterSpan = Number(document.getElementById('shorterSpan').value);
-            const liveLoad = Number(document.getElementById('liveLoad').value);
-            const floorFinish = Number(document.getElementById('floorFinish').value);
-            const mainBarDia = Number(document.getElementById('mainBarDia').value);
-            const distBarDia = Number(document.getElementById('distBarDia').value);
-            const rateSand = Number(document.getElementById('sandRate').value);
-            const rateAggregate = Number(document.getElementById('aggregateRate').value);
-            const rateCement = Number(document.getElementById('cementRate').value);
-            const rateSteel415 = Number(document.getElementById('steelFe415Rate').value);
-            const rateSteel500 = Number(document.getElementById('steelFe500Rate').value);
-            const rateSteel550 = Number(document.getElementById('steelFe550Rate').value);
+            const inputs = {
+                longerSpan: Number(document.getElementById('longerSpan').value) || 0,
+                shorterSpan: Number(document.getElementById('shorterSpan').value) || 0,
+                liveLoad: Number(document.getElementById('liveLoad').value) || 0,
+                floorFinish: Number(document.getElementById('floorFinish').value) || 0,
+                mainBarDia: Number(document.getElementById('mainBarDia').value) || 0,
+                distBarDia: Number(document.getElementById('distBarDia').value) || 0,
+                rateSand: Number(document.getElementById('sandRate').value) || 0,
+                rateAggregate: Number(document.getElementById('aggregateRate').value) || 0,
+                rateCement: Number(document.getElementById('cementRate').value) || 0,
+                rateSteel415: Number(document.getElementById('steelFe415Rate').value) || 0,
+                rateSteel500: Number(document.getElementById('steelFe500Rate').value) || 0,
+                rateSteel550: Number(document.getElementById('steelFe550Rate').value) || 0
+            };
+
+            // Check if all inputs are filled to proceed with calculations
+            if (Object.values(inputs).some(val => val === 0)) {
+                document.getElementById('results').innerHTML = '<p>Please fill all fields to see results.</p>';
+                return;
+            }
 
             let results = [];
             for (let fck of fckValues) {
                 for (let fy of fyValues) {
-                    let aspectRatio = longerSpan / shorterSpan;
+                    let aspectRatio = inputs.longerSpan / inputs.shorterSpan;
                     let slabType = aspectRatio > 2 ? "One Way" : "Two Way";
                     let effectiveDepthD = 125;
                     let effectiveCover = 25;
                     let totalDepth = Math.round((effectiveDepthD + effectiveCover) * 100) / 100;
 
-                    let effectiveSpan = Math.round(Math.min(shorterSpan + effectiveDepthD / 1000, shorterSpan + widthSupports) * 100) / 100;
+                    let effectiveSpan = Math.round(Math.min(inputs.shorterSpan + effectiveDepthD / 1000, inputs.shorterSpan + widthSupports) * 100) / 100;
                     let deadLoadSlab = Math.round((totalDepth / 1000 * 25) * 100) / 100;
-                    let deadLoadFloorFinish = Math.round(floorFinish * 100) / 100;
+                    let deadLoadFloorFinish = Math.round(inputs.floorFinish * 100) / 100;
                     let totalDeadLoadSlab = Math.round((deadLoadSlab + deadLoadFloorFinish) * 100) / 100;
-                    let wu = Math.round((1.5 * (totalDeadLoadSlab + liveLoad)) * 100) / 100;
+                    let wu = Math.round((1.5 * (totalDeadLoadSlab + inputs.liveLoad)) * 100) / 100;
 
                     let mu = Math.round((wu * effectiveSpan * effectiveSpan / 8) * 100) / 100;
                     let vu = Math.round((wu * effectiveSpan / 2) * 100) / 100;
@@ -219,12 +222,12 @@
                     let astMain = Math.round((0.5 * fck / fy * (1 - Math.sqrt(1 - (4.6 * mu * 1e6) / (fck * 1000 * effectiveDepthD * effectiveDepthD))) * 1000 * effectiveDepthD) * 100) / 100;
                     let astMin = Math.round((0.0012 * 1000 * totalDepth) * 100) / 100;
 
-                    let areaOneMainBar = Math.round((Math.PI / 4 * mainBarDia * mainBarDia) * 100) / 100;
+                    let areaOneMainBar = Math.round((Math.PI / 4 * inputs.mainBarDia * inputs.mainBarDia) * 100) / 100;
                     let spacingMainBar = Math.round((1000 * areaOneMainBar / astMain / 10)) * 10;
                     let adoptSpacingMain = Math.floor(Math.min(3 * effectiveDepthD, 300, spacingMainBar) / 10) * 10;
                     let astMainProvided = Math.round((1000 * areaOneMainBar / adoptSpacingMain) * 100) / 100;
 
-                    let areaOneDistBar = Math.round((Math.PI / 4 * distBarDia * distBarDia) * 100) / 100;
+                    let areaOneDistBar = Math.round((Math.PI / 4 * inputs.distBarDia * inputs.distBarDia) * 100) / 100;
                     let spacingDistBar = Math.ceil((1000 * areaOneDistBar / astMin / 10)) * 10;
                     let adoptSpacingDist = Math.floor(Math.min(5 * effectiveDepthD, 450, spacingDistBar) / 10) * 10;
                     let astDistProvided = Math.round((1000 * areaOneDistBar / adoptSpacingDist) * 100) / 100;
@@ -236,20 +239,20 @@
                     if (tv > designShearStrength) continue;
                     let shearCheck = "Safe";
 
-                    let numMainBars = Math.ceil((longerSpan * 1000) / adoptSpacingMain) + 1;
-                    let mainSteelMeters = numMainBars * shorterSpan;
-                    let mainBarWeight = barWeights[mainBarDia] || 0.395;
+                    let numMainBars = Math.ceil((inputs.longerSpan * 1000) / adoptSpacingMain) + 1;
+                    let mainSteelMeters = numMainBars * inputs.shorterSpan;
+                    let mainBarWeight = barWeights[inputs.mainBarDia] || 0.395;
                     let mainBarKgs = mainSteelMeters * mainBarWeight;
 
-                    let numDistBars = Math.ceil((shorterSpan * 1000) / adoptSpacingDist) + 1;
-                    let distSteelMeters = numDistBars * longerSpan;
-                    let distBarWeight = barWeights[distBarDia] || 0.395;
+                    let numDistBars = Math.ceil((inputs.shorterSpan * 1000) / adoptSpacingDist) + 1;
+                    let distSteelMeters = numDistBars * inputs.longerSpan;
+                    let distBarWeight = barWeights[inputs.distBarDia] || 0.395;
                     let distBarKgs = distSteelMeters * distBarWeight;
 
                     let totalSteelWeight = Math.round((mainBarKgs + distBarKgs) * 100) / 100;
 
                     let totalDepthM = Math.round((totalDepth / 1000) * 100) / 100;
-                    let volumeWetConcrete = Math.round((longerSpan * shorterSpan * totalDepthM) * 100) / 100;
+                    let volumeWetConcrete = Math.round((inputs.longerSpan * inputs.shorterSpan * totalDepthM) * 100) / 100;
                     let volumeDryConcrete = Math.round((volumeWetConcrete * 1.54) * 100) / 100;
 
                     let ratios = fck === 20 ? [1, 1.5, 3] : (fck === 25 ? [1, 1, 2] : [1, 0.75, 1.5]);
@@ -263,25 +266,29 @@
                     let sandInTon = Math.round((volumeSand * 1600 / 1000) * 100) / 100;
                     let aggregateInTon = Math.round((volumeAggregate * 1450 / 1000) * 100) / 100;
 
-                    let priceCement = Math.round((numCementBags * rateCement) * 100) / 100;
-                    let steelRate = fy === 415 ? rateSteel415 : (fy === 500 ? rateSteel500 : rateSteel550);
+                    let priceCement = Math.round((numCementBags * inputs.rateCement) * 100) / 100;
+                    let steelRate = fy === 415 ? inputs.rateSteel415 : (fy === 500 ? inputs.rateSteel500 : inputs.rateSteel550);
                     let priceSteel = Math.round((totalSteelWeight * steelRate) * 100) / 100;
-                    let priceSand = Math.round((sandInTon * rateSand) * 100) / 100;
-                    let priceAggregate = Math.round((aggregateInTon * rateAggregate) * 100) / 100;
+                    let priceSand = Math.round((sandInTon * inputs.rateSand) * 100) / 100;
+                    let priceAggregate = Math.round((aggregateInTon * inputs.rateAggregate) * 100) / 100;
                     let totalPrice = Math.round((priceCement + priceSteel + priceSand + priceAggregate) * 100) / 100;
 
-                    results.push([fck, fy, slabType, totalDepth, mulim, mainBarDia, adoptSpacingMain, distBarDia, adoptSpacingDist, shearCheck, totalSteelWeight, numCementBags, sandInTon, aggregateInTon, totalPrice]);
+                    results.push([fck, fy, slabType, totalDepth, mulim, inputs.mainBarDia, adoptSpacingMain, inputs.distBarDia, adoptSpacingDist, shearCheck, totalSteelWeight, numCementBags, sandInTon, aggregateInTon, totalPrice]);
                 }
             }
 
             // Display results
             const columns = ["Fck", "Fy", "Slab Type", "Total Depth", "Ultimate Moment of Resistance", "Main Bar Dia", "Main Bar Spacing", "Dist Bar Dia", "Dist Bar Spacing", "Shear Check", "Total Steel Weight", "No of Cement Bags", "Sand in Tons", "Aggregate in Tons", "Total Price"];
             let html = '<table><thead><tr>' + columns.map(col => `<th>${col}</th>`).join('') + '</tr></thead><tbody>';
-            let minPrice = Math.min(...results.map(r => r[14]));
-            results.forEach(row => {
-                let isBestCost = row[14] === minPrice;
-                html += `<tr${isBestCost ? ' class="best-cost"' : ''}>` + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
-            });
+            if (results.length === 0) {
+                html += '<tr><td colspan="15">No valid designs found. Adjust inputs.</td></tr>';
+            } else {
+                let minPrice = Math.min(...results.map(r => r[14]));
+                results.forEach(row => {
+                    let isBestCost = row[14] === minPrice;
+                    html += `<tr${isBestCost ? ' class="best-cost"' : ''}>` + row.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+                });
+            }
             html += '</tbody></table>';
             document.getElementById('results').innerHTML = html;
         }
