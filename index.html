@@ -46,17 +46,21 @@
             box-sizing: border-box;
         }
         #results {
-            overflow-x: auto;
+            overflow-x: hidden; /* Remove horizontal scrolling */
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            table-layout: auto; /* Allow columns to adjust automatically */
         }
         th, td {
-            padding: 12px;
+            padding: 8px; /* Reduced padding from 12px to 8px */
             text-align: center;
             border: 1px solid #ddd;
+            white-space: normal; /* Allow text wrapping */
+            word-wrap: break-word; /* Break long words if needed */
+            font-size: 14px; /* Slightly smaller font size */
         }
         th {
             background-color: #3498db;
@@ -68,7 +72,6 @@
         tr.best-cost {
             background-color: #d4efdf !important;
         }
-        /* Added styling for centered units in brackets */
         th span.unit {
             display: inline-block;
             vertical-align: middle;
