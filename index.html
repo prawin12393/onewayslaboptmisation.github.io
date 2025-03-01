@@ -222,10 +222,7 @@
             <div id="summary"></div>
             <div id="table-container"></div>
             <div class="chart-container">
-                <canvas id="costChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="depthChart"></canvas>
+                <canvas id="priceChart"></canvas> <!-- New canvas for the price vs. combination chart -->
             </div>
         </div>
     </div>
@@ -252,7 +249,7 @@
             3.00: { 'M15': 0.71, 'M20': 0.82, 'M25': 0.92, 'M30': 0.96, 'M35': 0.99, 'M40+': 1.01 }
         };
 
-        let costChart, depthChart;
+        let priceChart;
 
         function calculateShearStrength(Asbd_100, grade) {
             let gradeKey = grade < 40 ? `M${grade}` : 'M40+';
@@ -426,66 +423,50 @@
         }
 
         function destroyCharts() {
-            if (costChart) costChart.destroy();
-            if (depthChart) depthChart.destroy();
+            if (priceChart) priceChart.destroy();
         }
 
         function updateCharts(results) {
             destroyCharts();
 
-            const combinations = results.map(r => `${r[0]}-${r[1]}`);
-            const prices = results.map(r => r[14]);
-            const costCtx = document.getElementById('costChart').getContext('2d');
-            costChart = new Chart(costCtx, {
+            // Prepare data for the line diagram
+            const combinations = results.map(r => `${r[0]}-${r[1]}`); // Fck-Fy Combinations as labels
+            const prices = results.map(r => r[14]); // Total Price (INR)
+
+            const chartCtx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(chartCtx, {
                 type: 'line',
                 data: {
                     labels: combinations,
                     datasets: [{
                         label: 'Total Price (INR)',
                         data: prices,
-                        borderColor: '#e74c3c',
-                        backgroundColor: 'rgba(231, 76, 60, 0.2)',
-                        fill: true,
-                        tension: 0.1
+                        borderColor: 'blue', // Match the image's blue line
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)', // Light blue fill
+                        pointRadius: 5, // Circular data points like in the image
+                        pointBackgroundColor: 'blue',
+                        fill: true, // Fill under the line
+                        tension: 0.1 // Smooth the line
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
-                        x: { title: { display: true, text: 'Fck-Fy Combinations' } },
-                        y: { title: { display: true, text: 'Total Price (INR)' }, beginAtZero: true }
+                        x: {
+                            title: { display: true, text: 'Fck-Fy Combinations' }, // X-axis label
+                            ticks: { autoSkip: false } // Ensure all combinations are shown
+                        },
+                        y: {
+                            title: { display: true, text: 'Total Price (INR)' }, // Y-axis label
+                            beginAtZero: true
+                        }
                     },
                     plugins: {
-                        title: { display: true, text: 'Cost vs Design Combinations' },
+                        title: { display: true, text: 'Y vs. X' }, // Match the image's title
                         tooltip: { mode: 'index', intersect: false }
-                    }
-                }
-            });
-
-            const depths = results.map(r => r[3]);
-            const moments = results.map(r => r[4]);
-            const depthCtx = document.getElementById('depthChart').getContext('2d');
-            depthChart = new Chart(depthCtx, {
-                type: 'bar',
-                data: {
-                    labels: depths,
-                    datasets: [{
-                        label: 'Ultimate Moment of Resistance (kNm)',
-                        data: moments,
-                        backgroundColor: '#3498db',
-                        borderColor: '#2980b9',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: { title: { display: true, text: 'Total Depth (mm)' } },
-                        y: { title: { display: true, text: 'Ultimate Moment (kNm)' }, beginAtZero: true }
                     },
-                    plugins: {
-                        title: { display: true, text: 'Depth vs Ultimate Moment' },
-                        tooltip: { mode: 'index', intersect: false }
+                    elements: {
+                        point: { radius: 5, hitRadius: 5, hoverRadius: 7 } // Ensure points are visible
                     }
                 }
             });
