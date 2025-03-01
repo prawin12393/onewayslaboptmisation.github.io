@@ -222,7 +222,10 @@
             <div id="summary"></div>
             <div id="table-container"></div>
             <div class="chart-container">
-                <canvas id="priceChart"></canvas> <!-- Canvas for the scatter diagram -->
+                <canvas id="priceChart"></canvas> <!-- Canvas for the scatter line diagram -->
+            </div>
+            <div class="chart-container">
+                <canvas id="depthChart"></canvas> <!-- Canvas for the bar graph -->
             </div>
         </div>
     </div>
@@ -249,7 +252,7 @@
             3.00: { 'M15': 0.71, 'M20': 0.82, 'M25': 0.92, 'M30': 0.96, 'M35': 0.99, 'M40+': 1.01 }
         };
 
-        let priceChart;
+        let priceChart, depthChart;
 
         function calculateShearStrength(Asbd_100, grade) {
             let gradeKey = grade < 40 ? `M${grade}` : 'M40+';
@@ -424,27 +427,31 @@
 
         function destroyCharts() {
             if (priceChart) priceChart.destroy();
+            if (depthChart) depthChart.destroy();
         }
 
         function updateCharts(results) {
             destroyCharts();
 
-            // Prepare data for the scatter diagram
+            // Prepare data for the scatter line diagram (Fck-Fy Combinations vs. Total Price)
             const combinations = results.map(r => `${r[0]}-${r[1]}`); // Fck-Fy Combinations as labels
             const prices = results.map(r => r[14]); // Total Price (INR)
 
-            const chartCtx = document.getElementById('priceChart').getContext('2d');
-            priceChart = new Chart(chartCtx, {
-                type: 'scatter', // Changed to scatter chart
+            const priceChartCtx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(priceChartCtx, {
+                type: 'scatter', // Scatter plot with line
                 data: {
                     labels: combinations,
                     datasets: [{
                         label: 'Total Price (INR)',
-                        data: prices.map((price, index) => ({ x: index, y: price })), // Format data for scatter
-                        backgroundColor: 'blue', // Blue points to match the image
+                        data: prices.map((price, index) => ({ x: index, y: price })), // Map to x, y coordinates
+                        borderColor: 'blue', // Match the image's blue line
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)', // Light blue fill
                         pointRadius: 5, // Circular data points like in the image
-                        pointHoverRadius: 7,
-                        pointHitRadius: 5
+                        pointBackgroundColor: 'blue',
+                        fill: true, // Fill under the line
+                        showLine: true, // Connect points with a line
+                        tension: 0.1 // Smooth the line
                     }]
                 },
                 options: {
@@ -452,12 +459,7 @@
                     scales: {
                         x: {
                             title: { display: true, text: 'Fck-Fy Combinations' }, // X-axis label
-                            ticks: {
-                                callback: function(value) {
-                                    return combinations[value]; // Map index to combination labels
-                                },
-                                autoSkip: false // Ensure all combinations are shown
-                            }
+                            ticks: { callback: (value) => combinations[value], autoSkip: false } // Custom labels for combinations
                         },
                         y: {
                             title: { display: true, text: 'Total Price (INR)' }, // Y-axis label
@@ -466,6 +468,39 @@
                     },
                     plugins: {
                         title: { display: true, text: 'Y vs. X' }, // Match the image's title
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    elements: {
+                        point: { radius: 5, hitRadius: 5, hoverRadius: 7 } // Ensure points are visible
+                    }
+                }
+            });
+
+            // Prepare data for the bar graph (Depth vs. Ultimate Moment)
+            const depths = results.map(r => r[3]); // Total Depth (mm)
+            const moments = results.map(r => r[4]); // Ultimate Moment (kNm)
+
+            const depthChartCtx = document.getElementById('depthChart').getContext('2d');
+            depthChart = new Chart(depthChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: depths,
+                    datasets: [{
+                        label: 'Ultimate Moment of Resistance (kNm)',
+                        data: moments,
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Total Depth (mm)' } },
+                        y: { title: { display: true, text: 'Ultimate Moment (kNm)' }, beginAtZero: true }
+                    },
+                    plugins: {
+                        title: { display: true, text: 'Depth vs Ultimate Moment' },
                         tooltip: { mode: 'index', intersect: false }
                     }
                 }
