@@ -222,7 +222,7 @@
             <div id="summary"></div>
             <div id="table-container"></div>
             <div class="chart-container">
-                <canvas id="priceChart"></canvas> <!-- New canvas for the price vs. combination chart -->
+                <canvas id="priceChart"></canvas> <!-- Canvas for the scatter diagram -->
             </div>
         </div>
     </div>
@@ -429,24 +429,22 @@
         function updateCharts(results) {
             destroyCharts();
 
-            // Prepare data for the line diagram
+            // Prepare data for the scatter diagram
             const combinations = results.map(r => `${r[0]}-${r[1]}`); // Fck-Fy Combinations as labels
             const prices = results.map(r => r[14]); // Total Price (INR)
 
             const chartCtx = document.getElementById('priceChart').getContext('2d');
             priceChart = new Chart(chartCtx, {
-                type: 'line',
+                type: 'scatter', // Changed to scatter chart
                 data: {
                     labels: combinations,
                     datasets: [{
                         label: 'Total Price (INR)',
-                        data: prices,
-                        borderColor: 'blue', // Match the image's blue line
-                        backgroundColor: 'rgba(0, 0, 255, 0.2)', // Light blue fill
+                        data: prices.map((price, index) => ({ x: index, y: price })), // Format data for scatter
+                        backgroundColor: 'blue', // Blue points to match the image
                         pointRadius: 5, // Circular data points like in the image
-                        pointBackgroundColor: 'blue',
-                        fill: true, // Fill under the line
-                        tension: 0.1 // Smooth the line
+                        pointHoverRadius: 7,
+                        pointHitRadius: 5
                     }]
                 },
                 options: {
@@ -454,7 +452,12 @@
                     scales: {
                         x: {
                             title: { display: true, text: 'Fck-Fy Combinations' }, // X-axis label
-                            ticks: { autoSkip: false } // Ensure all combinations are shown
+                            ticks: {
+                                callback: function(value) {
+                                    return combinations[value]; // Map index to combination labels
+                                },
+                                autoSkip: false // Ensure all combinations are shown
+                            }
                         },
                         y: {
                             title: { display: true, text: 'Total Price (INR)' }, // Y-axis label
@@ -464,9 +467,6 @@
                     plugins: {
                         title: { display: true, text: 'Y vs. X' }, // Match the image's title
                         tooltip: { mode: 'index', intersect: false }
-                    },
-                    elements: {
-                        point: { radius: 5, hitRadius: 5, hoverRadius: 7 } // Ensure points are visible
                     }
                 }
             });
