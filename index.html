@@ -446,12 +446,13 @@
                         label: 'Total Price (INR)',
                         data: prices.map((price, index) => ({ x: index, y: price })), // Map to x, y coordinates
                         borderColor: 'blue', // Match the image's blue line
-                        backgroundColor: 'rgba(0, 0, 255, 0.2)', // Light blue fill
+                        backgroundColor: 'blue', // Point color
                         pointRadius: 5, // Circular data points like in the image
                         pointBackgroundColor: 'blue',
-                        fill: true, // Fill under the line
+                        fill: false, // Remove shadow/fill under the line
                         showLine: true, // Connect points with a line
-                        tension: 0.1 // Smooth the line
+                        tension: 0.1, // Smooth the line
+                        borderWidth: 2 // Make the line more visible
                     }]
                 },
                 options: {
@@ -463,11 +464,12 @@
                         },
                         y: {
                             title: { display: true, text: 'Total Price (INR)' }, // Y-axis label
-                            beginAtZero: true
+                            beginAtZero: true,
+                            suggestedMax: Math.max(...prices) * 1.2 // Dynamic max based on data
                         }
                     },
                     plugins: {
-                        title: { display: true, text: 'Y vs. X' }, // Match the image's title
+                        title: { display: true, text: 'Price vs. Fck-Fy Combinations' }, // Updated title
                         tooltip: { mode: 'index', intersect: false }
                     },
                     elements: {
